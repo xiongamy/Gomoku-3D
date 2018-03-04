@@ -1,9 +1,9 @@
 public class Board3D {
     private int[][][] board;
     private int winner;
-    private boardxy;
-    private boardyz;
-    private boardxz;
+    private Board2D boardxy;
+    private Board2D boardyz;
+    private Board2D boardxz;
     
     public Board3D() {
         board = new int[15][15][15];
