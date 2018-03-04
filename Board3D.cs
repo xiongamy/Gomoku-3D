@@ -1,19 +1,16 @@
-public class Board2D {
-    private int[][] board;
-    private bool win1;
-    private bool win2;
-    priavte static readonly int[][] directions =
-        new int[][] {
-            new int[] {0, 1},
-            new int[] {1, 1},
-            new int[] {1, 0},
-            new int[] {1, -1}
-        };
+public class Board3D {
+    private int[][][] board;
+    private int winner;
+    private boardxy;
+    private boardyz;
+    private boardxz;
     
-    public Board2D() {
-        board = new int[15][15];
-        win1 = false;
-        win2 = false;
+    public Board3D() {
+        board = new int[15][15][15];
+        winner = 0;
+        boardxy = new Board2D();
+        boardyz = new Board2D();
+        boardxz = new Board2D();
     }
     
     /**
@@ -49,7 +46,7 @@ public class Board2D {
         checkCoord(y);
         checkPlayer(player);
         
-        return board[x][y] == 0;
+        return isValidMove(boardxy) && isValidMove(boardyz) && isValidMove(boardxz);
     }
     
     /**
@@ -67,40 +64,11 @@ public class Board2D {
         checkCoord(y);
         checkPlayer(player);
         
-        foreach (dir in directions) {
-            dx = dir[0];
-            dy = dir[1];
-            
-            int total = 0;
-            
-            int newx = x + dx;
-            int newy = y + dy;
-            while (total < 4 && newx >= 0 && newx < 15 && newy >= 0 && newy < 15) {
-                if (board[newx][newy] == player) {
-                    total++;
-                    newx += dx;
-                    newy += dy;
-                } else {
-                    break;
-                }
-            }
-            newx = x - dx;
-            newy = y - dy;
-            while (total < 4 && newx >= 0 && newx < 15 && newy >= 0 && newy < 15) {
-                if (board[newx][newy] == player) {
-                    total++;
-                    newx -= dx;
-                    newy -= dy;
-                } else {
-                    break;
-                }
-            }
-            
-            if (total >= 4) {
-                return true
-            }
-        }
-        return false;
+        bool xywin = boardxy.isWinningMove(x, y, player) || boardxy.won(player);
+        bool yzwin = boardyz.isWinningMove(y, z, player) || boardyz.won(player);
+        bool xzwin = boardxz.isWinningMove(x, z, player) || boardxz.won(player);
+        
+        return xywin && yzwin && xzwin;
     }
     
     /**
@@ -113,11 +81,7 @@ public class Board2D {
      */
     public bool won(int player) {
         checkPlayer(player);
-        if (player == 1) {
-            return win1;
-        } else {
-            return win2;
-        }
+        return winner == player;
     }
     
     /**
@@ -140,14 +104,14 @@ public class Board2D {
             return false;
         }
         
-        board[x][y] = player;
+        Assert(boardxy.makeMove(x, y, player));
+        Assert(boardyz.makeMove(y, z, player));
+        Assert(boardxz.makeMove(x, z, player));
         
-        if (isWinningMove(x, y, player)) {
-            if (player == 1) {
-                win1 = true;
-            } else {
-                win2 = true;
-            }
+        board[x][y][z] = player;
+        
+        if (isWinningMove(x, y, z, player)) {
+            winner = player
         }
         
         return true;
@@ -161,12 +125,63 @@ public class Board2D {
      * @param
      *   int x - 0-indexed x coordinate
      *   int y - 0-indexed y coordinate
+     *   int z - 0-indexed z coordinate
      * @returns
      *   int - 0 if no token is placed
      *         1 if the token placed belongs to player 1
      *         2 if the token placed belongs to player 2
      */
-    public int getToken(int x, int y) {
-        return board[x][y];
+    public int getToken(int x, int y, int z) {
+        return board[x][y][z];
     }
+    
+    /**
+     * Takes in 0-indexed coordinates and outputs the type of token
+     * placed at coordinates of the xy projection
+     * 
+     * @param
+     *   int x - 0-indexed x coordinate
+     *   int y - 0-indexed y coordinate
+     * @returns
+     *   int - 0 if no token is placed
+     *         1 if the token placed belongs to player 1
+     *         2 if the token placed belongs to player 2
+     */
+    public int getxyToken(int x, int y) {
+        return boardxy.getToken(x, y);
+    }
+    
+    /**
+     * Takes in 0-indexed coordinates and outputs the type of token
+     * placed at coordinates of the yz projection
+     * 
+     * @param
+     *   int y - 0-indexed y coordinate
+     *   int z - 0-indexed z coordinate
+     * @returns
+     *   int - 0 if no token is placed
+     *         1 if the token placed belongs to player 1
+     *         2 if the token placed belongs to player 2
+     */
+    public int getyzToken(int y, int z) {
+        return boardyz.getToken(y, z);
+    }
+    
+    /**
+     * Takes in 0-indexed coordinates and outputs the type of token
+     * placed at coordinates of the xz projection
+     * 
+     * @param
+     *   int x - 0-indexed x coordinate
+     *   int z - 0-indexed z coordinate
+     * @returns
+     *   int - 0 if no token is placed
+     *         1 if the token placed belongs to player 1
+     *         2 if the token placed belongs to player 2
+     */
+    public int getxzToken(int x, int z) {
+        return boardxz.getToken(x, z);
+    }
+    
+    
 }
