@@ -1,8 +1,8 @@
 public class Board2D {
-    private int[][] board;
+    private int[,] board;
     private bool win1;
     private bool win2;
-    priavte static readonly int[][] directions =
+    private static readonly int[][] directions =
         new int[][] {
             new int[] {0, 1},
             new int[] {1, 1},
@@ -11,7 +11,7 @@ public class Board2D {
         };
     
     public Board2D() {
-        board = new int[15][15];
+        board = new int[15, 15];
         win1 = false;
         win2 = false;
     }
@@ -49,7 +49,7 @@ public class Board2D {
         checkCoord(y);
         checkPlayer(player);
         
-        return board[x][y] == 0;
+        return board[x, y] == 0;
     }
     
     /**
@@ -62,21 +62,21 @@ public class Board2D {
      * @returns
      *   bool - whether the given move wins
      */
-    private bool isWinningMove(int x, int y, int player) {
+    public bool isWinningMove(int x, int y, int player) {
         checkCoord(x);
         checkCoord(y);
         checkPlayer(player);
         
-        foreach (dir in directions) {
-            dx = dir[0];
-            dy = dir[1];
+        foreach (int[] dir in directions) {
+            int dx = dir[0];
+            int dy = dir[1];
             
             int total = 0;
             
             int newx = x + dx;
             int newy = y + dy;
             while (total < 4 && newx >= 0 && newx < 15 && newy >= 0 && newy < 15) {
-                if (board[newx][newy] == player) {
+                if (board[newx, newy] == player) {
                     total++;
                     newx += dx;
                     newy += dy;
@@ -87,7 +87,7 @@ public class Board2D {
             newx = x - dx;
             newy = y - dy;
             while (total < 4 && newx >= 0 && newx < 15 && newy >= 0 && newy < 15) {
-                if (board[newx][newy] == player) {
+                if (board[newx, newy] == player) {
                     total++;
                     newx -= dx;
                     newy -= dy;
@@ -97,7 +97,7 @@ public class Board2D {
             }
             
             if (total >= 4) {
-                return true
+                return true;
             }
         }
         return false;
@@ -140,7 +140,7 @@ public class Board2D {
             return false;
         }
         
-        board[x][y] = player;
+        board[x, y] = player;
         
         if (isWinningMove(x, y, player)) {
             if (player == 1) {
@@ -167,6 +167,6 @@ public class Board2D {
      *         2 if the token placed belongs to player 2
      */
     public int getToken(int x, int y) {
-        return board[x][y];
+        return board[x, y];
     }
 }
