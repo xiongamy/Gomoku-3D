@@ -10,14 +10,10 @@ public class Rot_grid : MonoBehaviour
     // Use this for initialization
     //void Start () {	}
     public int xSize, ySize, zSize;
-    public float speed;
     private Mesh mesh;
     private Vector3[] vertices;
-
-    // Update is called once per frame
-    //void Update () {
-    //    transform.Rotate(Vector3.up, speed * Time.deltaTime);
-    //}
+    public GameObject Token;
+    public GameObject Board;
 
     private void Awake()
     {
@@ -31,9 +27,9 @@ public class Rot_grid : MonoBehaviour
         CreateVertices();
         CreateTriangles();
     }
+    
 
-    private static int
-    SetQuad(int[] triangles, int i, int v00, int v10, int v01, int v11)
+    private static int SetQuad(int[] triangles, int i, int v00, int v10, int v01, int v11)
     {
         triangles[i] = v00;
         triangles[i + 1] = triangles[i + 4] = v01;
@@ -41,9 +37,10 @@ public class Rot_grid : MonoBehaviour
         triangles[i + 5] = v11;
         return i + 6;
     }
+
+
     private void CreateVertices()
     {
-
         int cornerVertices = 8;
         int edgeVertices = (xSize + ySize + zSize - 3) * 4;
         int faceVertices = (
@@ -87,6 +84,15 @@ public class Rot_grid : MonoBehaviour
             }
         }
         mesh.vertices = vertices;
+
+        GameObject BoardObject = Instantiate(Board, new Vector3(xSize/2,ySize/2,zSize/2), Quaternion.identity) as GameObject;
+        BoardObject.transform.localScale = new Vector3(xSize, ySize, zSize);
+        BoardObject.transform.parent = gameObject.transform;
+
+        for (int i=0; i < cornerVertices + edgeVertices + faceVertices; i++){
+            GameObject TokenObject = Instantiate(Token, vertices[i], Quaternion.identity) as GameObject;
+            TokenObject.transform.parent = BoardObject.transform;
+        }
     }
     private void CreateTriangles()
     {
@@ -102,7 +108,6 @@ public class Rot_grid : MonoBehaviour
             }
             t = SetQuad(triangles, t, v, v - ring + 1, v + ring, v + 1);
         }
-        //mesh.triangles = triangles;
         t = CreateTopFace(triangles, t, ring);
         t = CreateBottomFace(triangles, t, ring);
 
@@ -116,6 +121,7 @@ public class Rot_grid : MonoBehaviour
         {
             t = SetQuad(triangles, t, v, v + 1, v + ring - 1, v + ring);
         }
+        t = SetQuad(triangles, t, v, v + 1, v + ring - 1, v + 2);
         int vMin = ring * (ySize + 1) - 1;
         int vMid = vMin + 1;
         int vMax = v + 2;
@@ -179,21 +185,4 @@ public class Rot_grid : MonoBehaviour
         return t;
     }
 
-    private void OnDrawGizmos()
-    {
-        if (vertices == null) { return; }
-        Gizmos.color = Color.red;
-        for (int i = 0; i < vertices.Length; i++)
-        {
-            Gizmos.DrawSphere(vertices[i], 0.1f);
-        }
-    }
-    void OnMouseDrag()
-    {
-        float rotX = Input.GetAxis("Mouse X") * speed;
-        float rotY = Input.GetAxis("Mouse Y") * speed;
-        // transform.Rotate(Vector3.up, -rotX);
-        // transform.Rotate(Vector3.right, rotY);
-        transform.Rotate(-rotY, rotX, 0);
-    }
 }
