@@ -1,12 +1,14 @@
+using System.Diagnostics;
+
 public class Board3D {
-    private int[][][] board;
+    private int[,,] board;
     private int winner;
     private Board2D boardxy;
     private Board2D boardyz;
     private Board2D boardxz;
     
     public Board3D() {
-        board = new int[15][15][15];
+        board = new int[15, 15, 15];
         winner = 0;
         boardxy = new Board2D();
         boardyz = new Board2D();
@@ -37,16 +39,21 @@ public class Board3D {
      * @param
      *   int x - 0-indexed x coordinate
      *   int y - 0-indexed y coordinate
+     *   int z - 0-indexed z coordinate
      *   int player - the player to make the move
      * @returns
      *   bool - whether the given move is valid
      */
-    public bool isValidMove(int x, int y, int player) {
+    public bool isValidMove(int x, int y, int z, int player) {
         checkCoord(x);
         checkCoord(y);
         checkPlayer(player);
         
-        return isValidMove(boardxy) && isValidMove(boardyz) && isValidMove(boardxz);
+        bool validxy = boardxy.isValidMove(x, y, player);
+        bool validyz = boardyz.isValidMove(y, z, player);
+        bool validxz = boardxz.isValidMove(x, z, player);
+        
+        return validxy && validyz && validxz;
     }
     
     /**
@@ -55,11 +62,12 @@ public class Board3D {
      * @param
      *   int x - 0-indexed x coordinate
      *   int y - 0-indexed y coordinate
+     *   int z - 0-indexed z coordinate
      *   int player - the player who makes the move
      * @returns
      *   bool - whether the given move wins
      */
-    private bool isWinningMove(int x, int y, int player) {
+    private bool isWinningMove(int x, int y, int z, int player) {
         checkCoord(x);
         checkCoord(y);
         checkPlayer(player);
@@ -91,27 +99,28 @@ public class Board3D {
      * @param
      *   int x - 0-indexed x coordinate
      *   int y - 0-indexed y coordinate
+     *   int z - 0-indexed z coordinate
      *   int player - the player who makes the move
      * @returns
      *   bool - whether the move was successfully made
      */
-    public bool makeMove(int x, int y, int player) {
+    public bool makeMove(int x, int y, int z, int player) {
         checkCoord(x);
         checkCoord(y);
         checkPlayer(player);
         
-        if (!isValidMove(x, y, player)) {
+        if (!isValidMove(x, y, z, player)) {
             return false;
         }
         
-        Assert(boardxy.makeMove(x, y, player));
-        Assert(boardyz.makeMove(y, z, player));
-        Assert(boardxz.makeMove(x, z, player));
+        Debug.Assert(boardxy.makeMove(x, y, player));
+        Debug.Assert(boardyz.makeMove(y, z, player));
+        Debug.Assert(boardxz.makeMove(x, z, player));
         
-        board[x][y][z] = player;
+        board[x, y, z] = player;
         
         if (isWinningMove(x, y, z, player)) {
-            winner = player
+            winner = player;
         }
         
         return true;
@@ -132,7 +141,7 @@ public class Board3D {
      *         2 if the token placed belongs to player 2
      */
     public int getToken(int x, int y, int z) {
-        return board[x][y][z];
+        return board[x, y, z];
     }
     
     /**
