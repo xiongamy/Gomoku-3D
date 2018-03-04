@@ -15,6 +15,6 @@ public class Arcball : MonoBehaviour
         float rotY = Input.GetAxis("Mouse Y");
         // transform.Rotate(Vector3.up, -rotX);
         // transform.Rotate(Vector3.right, rotY);
-        transform.Rotate(-rotY * speed, rotX * speed, 0);
+        transform.Rotate(rotY * speed, -rotX * speed, 0, Space.World);
     }
 }
